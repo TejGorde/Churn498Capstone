@@ -2,7 +2,7 @@
 Pydantic response and request models for Retain API.
 
 Every endpoint has a typed schema. TypeScript mirrors live in
-frontend/src/api/types.ts.
+frontend/src/types/api.ts.
 """
 
 from pydantic import BaseModel, ConfigDict
@@ -27,11 +27,9 @@ class KPIResponse(BaseModel):
 
 
 class TrendPoint(BaseModel):
-    month: str
-    signups: int
-    cancellations: int
-    net_growth: int
-    churn_rate: float
+    label: str
+    value: int
+    predicted: int | None = None
 
 
 class RiskDistribution(BaseModel):
@@ -43,15 +41,13 @@ class RiskDistribution(BaseModel):
 class ActiveInactiveDistribution(BaseModel):
     active: int
     inactive: int
-    active_pct: float
-    inactive_pct: float
+    recent_churn_30d: int
 
 
 class AgentInsight(BaseModel):
-    agent_name: str
+    title: str
     content: str
-    generated_at: str
-    status: str
+    timestamp: str | None = None
 
 
 # =============================================================================
@@ -72,7 +68,6 @@ class AccountAtRisk(BaseModel):
     last_stream_days: int
     open_tickets: int
     top_drivers: list[str]
-    shap_values: dict[str, float] | None = None
 
 
 class PaginatedAccounts(BaseModel):
@@ -83,50 +78,18 @@ class PaginatedAccounts(BaseModel):
 
 
 class PaymentRecord(BaseModel):
-    payment_id: str
-    payment_date: str
+    date: str
     amount: float
-    currency: str
-    payment_method: str
     status: str
-    failure_reason: str | None = None
+    method: str
 
 
 class TicketRecord(BaseModel):
-    ticket_id: str
-    created_at: str
-    category: str
+    id: str
+    date: str
+    subject: str
+    status: str
     priority: str
-    resolved_at: str | None = None
-
-
-class AccountDetail(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    account_id: str
-    email: str
-    signup_date: str
-    country: str
-    age: int
-    gender: str
-    plan_type: str
-    subscription_status: str
-    tenure_days: int
-    churn_probability: float
-    risk_tier: str
-    top_drivers: list[str]
-    shap_values: dict[str, float] | None = None
-    payment_history: list[PaymentRecord]
-    ticket_history: list[TicketRecord]
-    last_payment_days: int
-    last_stream_days: int
-    open_tickets: int
-    agent_narrative: str
-
-
-# =============================================================================
-# Analytics
-# =============================================================================
 
 
 class SHAPFeature(BaseModel):
@@ -135,17 +98,29 @@ class SHAPFeature(BaseModel):
     direction: str
 
 
+class AccountDetail(AccountAtRisk):
+    recent_payments: list[PaymentRecord]
+    recent_tickets: list[TicketRecord]
+    watch_hours_30d: float
+    watch_hours_90d: float
+    sessions_30d: int
+    content_categories: list[str]
+
+
+# =============================================================================
+# Analytics
+# =============================================================================
+
+
 class PlanBreakdown(BaseModel):
-    plan_type: str
-    total: int
-    churned: int
+    plan: str
+    count: int
     churn_rate: float
 
 
 class SegmentBreakdown(BaseModel):
     by_plan: list[PlanBreakdown]
-    by_tenure: list[dict]
-    by_payment_method: list[dict]
+    by_tenure: list[PlanBreakdown]
 
 
 class ModelMetrics(BaseModel):
@@ -153,9 +128,10 @@ class ModelMetrics(BaseModel):
     precision: float
     recall: float
     f1_score: float
-    accuracy: float
-    calibration_error: float | None = None
-    prediction_distribution: list[dict] | None = None
+    log_loss: float
+    calibration_error: float
+    last_trained: str
+    training_samples: int
 
 
 class DriftFeature(BaseModel):
@@ -167,14 +143,13 @@ class DriftFeature(BaseModel):
 class DriftStatus(BaseModel):
     overall_status: str
     features: list[DriftFeature]
-    checked_at: str
+    last_checked: str
 
 
 class AnalyticsOverview(BaseModel):
     kpis: KPIResponse
     risk_distribution: RiskDistribution
     top_shap_features: list[SHAPFeature]
-    plan_breakdown: list[PlanBreakdown]
 
 
 # =============================================================================

@@ -150,23 +150,20 @@ def get_account_detail(
         return {
             "account_id": row["account_id"],
             "email": row["email"],
-            "signup_date": str(row["signup_date"]),
-            "country": row["country"],
-            "age": int(row["age"]),
-            "gender": row["gender"],
             "plan_type": row["plan_type"],
-            "subscription_status": row["subscription_status"],
             "tenure_days": 0,
             "churn_probability": 0.0,
             "risk_tier": "low",
             "top_drivers": [],
-            "shap_values": None,
-            "payment_history": [],
-            "ticket_history": [],
             "last_payment_days": 0,
             "last_stream_days": 0,
             "open_tickets": 0,
-            "agent_narrative": "",
+            "recent_payments": [],
+            "recent_tickets": [],
+            "watch_hours_30d": 0.0,
+            "watch_hours_90d": 0.0,
+            "sessions_30d": 0,
+            "content_categories": [],
         }
     except Exception as e:
         logger.error(f"get_account_detail failed: {e}")
@@ -177,8 +174,8 @@ def get_shap_explanation(
     engine: Engine | None,
     account_id: str,
     demo_mode: bool = False,
-) -> dict[str, float] | None:
-    """Get SHAP explanation for an account."""
+) -> list[dict] | None:
+    """Get SHAP explanation for an account as SHAPFeature list."""
     if demo_mode or engine is None:
         return get_fixture_account_shap(account_id)
 

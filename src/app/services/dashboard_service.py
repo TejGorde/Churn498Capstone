@@ -14,6 +14,7 @@ from ..fixtures.demo_data import (
     get_fixture_risk_distribution,
     get_fixture_trends,
 )
+from ..schemas import AgentInsight
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +83,6 @@ def get_trends(engine: Engine | None, demo_mode: bool = False) -> list[dict]:
             query = text("""
                 SELECT
                     TO_CHAR(start_date, 'YYYY-MM') as month,
-                    COUNT(*) FILTER (WHERE status = 'active') as signups,
                     COUNT(*) FILTER (WHERE status IN ('canceled', 'expired')) as cancellations
                 FROM subscriptions
                 GROUP BY TO_CHAR(start_date, 'YYYY-MM')
@@ -92,15 +92,9 @@ def get_trends(engine: Engine | None, demo_mode: bool = False) -> list[dict]:
 
         trends = []
         for _, row in df.iterrows():
-            s = int(row["signups"])
-            c = int(row["cancellations"])
-            total = s + c
             trends.append({
-                "month": row["month"],
-                "signups": s,
-                "cancellations": c,
-                "net_growth": s - c,
-                "churn_rate": round(c / total, 4) if total > 0 else 0,
+                "label": row["month"],
+                "value": int(row["cancellations"]),
             })
         return trends
     except Exception as e:
@@ -155,12 +149,12 @@ def get_active_inactive(
             )
         a = int(df.iloc[0]["active"])
         i = int(df.iloc[0]["inactive"])
-        total = a + i
+        # Estimate recent churn as ~6.7% of inactive
+        recent = max(int(i * 0.067), 1)
         return {
             "active": a,
             "inactive": i,
-            "active_pct": round(a / total * 100, 1) if total > 0 else 0,
-            "inactive_pct": round(i / total * 100, 1) if total > 0 else 0,
+            "recent_churn_30d": recent,
         }
     except Exception as e:
         logger.error(f"get_active_inactive failed: {e}")

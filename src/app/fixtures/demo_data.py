@@ -13,31 +13,32 @@ from datetime import datetime
 # Dashboard Fixtures
 # =============================================================================
 
+
 _MONTHLY_TRENDS = [
-    {"month": "2024-01", "signups": 2810, "cancellations": 385, "churn_rate": 0.031},
-    {"month": "2024-02", "signups": 2640, "cancellations": 410, "churn_rate": 0.033},
-    {"month": "2024-03", "signups": 3120, "cancellations": 392, "churn_rate": 0.030},
-    {"month": "2024-04", "signups": 2950, "cancellations": 428, "churn_rate": 0.033},
-    {"month": "2024-05", "signups": 3210, "cancellations": 445, "churn_rate": 0.034},
-    {"month": "2024-06", "signups": 2780, "cancellations": 460, "churn_rate": 0.036},
-    {"month": "2024-07", "signups": 3050, "cancellations": 475, "churn_rate": 0.037},
-    {"month": "2024-08", "signups": 2890, "cancellations": 510, "churn_rate": 0.040},
-    {"month": "2024-09", "signups": 3340, "cancellations": 498, "churn_rate": 0.038},
-    {"month": "2024-10", "signups": 3180, "cancellations": 520, "churn_rate": 0.040},
-    {"month": "2024-11", "signups": 2760, "cancellations": 545, "churn_rate": 0.042},
-    {"month": "2024-12", "signups": 2950, "cancellations": 580, "churn_rate": 0.044},
-    {"month": "2025-01", "signups": 3410, "cancellations": 560, "churn_rate": 0.042},
-    {"month": "2025-02", "signups": 3060, "cancellations": 590, "churn_rate": 0.044},
-    {"month": "2025-03", "signups": 3280, "cancellations": 610, "churn_rate": 0.045},
-    {"month": "2025-04", "signups": 2870, "cancellations": 625, "churn_rate": 0.046},
-    {"month": "2025-05", "signups": 3150, "cancellations": 640, "churn_rate": 0.047},
-    {"month": "2025-06", "signups": 2980, "cancellations": 655, "churn_rate": 0.048},
-    {"month": "2025-07", "signups": 3090, "cancellations": 660, "churn_rate": 0.048},
-    {"month": "2025-08", "signups": 2840, "cancellations": 670, "churn_rate": 0.049},
-    {"month": "2025-09", "signups": 3220, "cancellations": 685, "churn_rate": 0.049},
-    {"month": "2025-10", "signups": 2910, "cancellations": 700, "churn_rate": 0.050},
-    {"month": "2025-11", "signups": 2780, "cancellations": 715, "churn_rate": 0.051},
-    {"month": "2025-12", "signups": 3050, "cancellations": 690, "churn_rate": 0.049},
+    {"label": "2024-01", "value": 385},
+    {"label": "2024-02", "value": 410},
+    {"label": "2024-03", "value": 392},
+    {"label": "2024-04", "value": 428},
+    {"label": "2024-05", "value": 445},
+    {"label": "2024-06", "value": 460},
+    {"label": "2024-07", "value": 475},
+    {"label": "2024-08", "value": 510},
+    {"label": "2024-09", "value": 498},
+    {"label": "2024-10", "value": 520},
+    {"label": "2024-11", "value": 545},
+    {"label": "2024-12", "value": 580},
+    {"label": "2025-01", "value": 560},
+    {"label": "2025-02", "value": 590},
+    {"label": "2025-03", "value": 610},
+    {"label": "2025-04", "value": 625},
+    {"label": "2025-05", "value": 640},
+    {"label": "2025-06", "value": 655},
+    {"label": "2025-07", "value": 660},
+    {"label": "2025-08", "value": 670},
+    {"label": "2025-09", "value": 685},
+    {"label": "2025-10", "value": 700},
+    {"label": "2025-11", "value": 715},
+    {"label": "2025-12", "value": 690, "predicted": 720},
 ]
 
 _AT_RISK_ACCOUNTS = [
@@ -414,13 +415,7 @@ def get_fixture_kpis() -> dict:
 
 def get_fixture_trends() -> list[dict]:
     """Return monthly trend fixture data."""
-    trends = []
-    for t in _MONTHLY_TRENDS:
-        trends.append({
-            **t,
-            "net_growth": t["signups"] - t["cancellations"],
-        })
-    return trends
+    return list(_MONTHLY_TRENDS)
 
 
 def get_fixture_risk_distribution() -> dict:
@@ -433,17 +428,15 @@ def get_fixture_active_inactive() -> dict:
     return {
         "active": 49684,
         "inactive": 10316,
-        "active_pct": 82.8,
-        "inactive_pct": 17.2,
+        "recent_churn_30d": 690,
     }
 
 
 def get_fixture_executive_summary() -> dict:
     """Return AI executive summary fixture."""
     return {
-        "agent_name": "Analysis Agent",
+        "title": "Subscriber Health Summary",
         "content": (
-            "### Subscriber Health Summary\n\n"
             "The platform currently serves **49,684 active subscribers** across "
             "60,000 total accounts. The 30-day predicted churn rate stands at "
             "**4.9%**, up from 4.4% last quarter — a trend worth monitoring.\n\n"
@@ -462,12 +455,9 @@ def get_fixture_executive_summary() -> dict:
             "2. Deploy re-engagement campaigns for the 680 disengaged accounts "
             "before they reach the 30-day inactivity cliff\n"
             "3. Review support ticket backlog — 4 accounts have 3+ unresolved "
-            "tickets and are at critical risk\n\n"
-            "[View At-Risk Accounts →](/at-risk) · "
-            "[See Full Analytics →](/analytics)"
+            "tickets and are at critical risk"
         ),
-        "generated_at": "2025-12-01T10:00:00",
-        "status": "complete",
+        "timestamp": "2025-12-01T10:00:00",
     }
 
 
@@ -506,60 +496,40 @@ def get_fixture_account_detail(account_id: str) -> dict | None:
     if account is None:
         return None
 
-    shap_map = {
-        d: round(0.15 - i * 0.02, 4)
-        for i, d in enumerate(account["top_drivers"])
-    }
-
     return {
         **account,
-        "signup_date": "2025-03-15",
-        "country": "US",
-        "age": 34,
-        "gender": "F",
-        "subscription_status": "active",
-        "shap_values": shap_map,
-        "payment_history": [
+        "recent_payments": [
             {
-                "payment_id": "PAY_001",
-                "payment_date": "2025-11-01",
+                "date": "2025-11-01",
                 "amount": 14.99,
-                "currency": "USD",
-                "payment_method": "credit_card",
                 "status": "success",
-                "failure_reason": None,
+                "method": "credit_card",
             },
             {
-                "payment_id": "PAY_002",
-                "payment_date": "2025-10-01",
+                "date": "2025-10-01",
                 "amount": 14.99,
-                "currency": "USD",
-                "payment_method": "credit_card",
                 "status": "failed",
-                "failure_reason": "insufficient_funds",
+                "method": "credit_card",
             },
         ],
-        "ticket_history": [
+        "recent_tickets": [
             {
-                "ticket_id": "TKT_001",
-                "created_at": "2025-11-20",
-                "category": "billing",
+                "id": "TKT_001",
+                "date": "2025-11-20",
+                "subject": "Billing issue",
+                "status": "open",
                 "priority": "high",
-                "resolved_at": None,
             },
         ],
-        "agent_narrative": (
-            f"Account {account_id} shows elevated churn risk driven primarily by "
-            f"{', '.join(account['top_drivers'][:2])}. "
-            "The combination of declining engagement and unresolved support issues "
-            "suggests this customer is actively considering cancellation. "
-            "Immediate intervention is recommended."
-        ),
+        "watch_hours_30d": 4.2,
+        "watch_hours_90d": 28.5,
+        "sessions_30d": 6,
+        "content_categories": ["thriller", "sci-fi", "drama"],
     }
 
 
-def get_fixture_account_shap(account_id: str) -> dict[str, float] | None:
-    """Return SHAP values fixture for an account."""
+def get_fixture_account_shap(account_id: str) -> list[dict] | None:
+    """Return SHAP values fixture for an account as SHAPFeature list."""
     account = next(
         (a for a in _AT_RISK_ACCOUNTS if a["account_id"] == account_id),
         None,
@@ -567,10 +537,14 @@ def get_fixture_account_shap(account_id: str) -> dict[str, float] | None:
     if account is None:
         return None
 
-    return {
-        d: round(0.15 - i * 0.02, 4)
-        for i, d in enumerate(account["top_drivers"])
-    }
+    features = []
+    for i, driver in enumerate(account["top_drivers"]):
+        features.append({
+            "feature": driver,
+            "importance": round(0.15 - i * 0.02, 4),
+            "direction": "negative" if driver == "tenure_days" else "positive",
+        })
+    return features
 
 
 def get_fixture_analytics_overview() -> dict:
@@ -579,11 +553,6 @@ def get_fixture_analytics_overview() -> dict:
         "kpis": get_fixture_kpis(),
         "risk_distribution": get_fixture_risk_distribution(),
         "top_shap_features": _SHAP_GLOBAL,
-        "plan_breakdown": [
-            {"plan_type": "Regular", "total": 38400, "churned": 7104, "churn_rate": 0.058},
-            {"plan_type": "Premium", "total": 15600, "churned": 2652, "churn_rate": 0.040},
-            {"plan_type": "Premium-Multi-Screen", "total": 6000, "churned": 560, "churn_rate": 0.028},
-        ],
     }
 
 
@@ -597,21 +566,15 @@ def get_fixture_segments() -> dict:
     """Return segment breakdowns."""
     return {
         "by_plan": [
-            {"plan_type": "Regular", "total": 38400, "churned": 7104, "churn_rate": 0.058},
-            {"plan_type": "Premium", "total": 15600, "churned": 2652, "churn_rate": 0.040},
-            {"plan_type": "Premium-Multi-Screen", "total": 6000, "churned": 560, "churn_rate": 0.028},
+            {"plan": "Regular", "count": 38400, "churn_rate": 0.058},
+            {"plan": "Premium", "count": 15600, "churn_rate": 0.040},
+            {"plan": "Premium-Multi-Screen", "count": 6000, "churn_rate": 0.028},
         ],
         "by_tenure": [
-            {"bucket": "0-3 months", "total": 8400, "churned": 1680, "churn_rate": 0.080},
-            {"bucket": "3-6 months", "total": 12000, "churned": 1920, "churn_rate": 0.064},
-            {"bucket": "6-12 months", "total": 18000, "churned": 1440, "churn_rate": 0.040},
-            {"bucket": "12+ months", "total": 21600, "churned": 1296, "churn_rate": 0.030},
-        ],
-        "by_payment_method": [
-            {"method": "credit_card", "total": 36000, "churned": 5400, "churn_rate": 0.050},
-            {"method": "debit_card", "total": 12000, "churned": 2160, "churn_rate": 0.060},
-            {"method": "bank_transfer", "total": 6000, "churned": 780, "churn_rate": 0.043},
-            {"method": "digital_wallet", "total": 6000, "churned": 600, "churn_rate": 0.033},
+            {"plan": "0-3 months", "count": 8400, "churn_rate": 0.080},
+            {"plan": "3-6 months", "count": 12000, "churn_rate": 0.064},
+            {"plan": "6-12 months", "count": 18000, "churn_rate": 0.040},
+            {"plan": "12+ months", "count": 21600, "churn_rate": 0.030},
         ],
     }
 
@@ -623,36 +586,26 @@ def get_fixture_model_performance() -> dict:
         "precision": 0.823,
         "recall": 0.756,
         "f1_score": 0.788,
-        "accuracy": 0.862,
+        "log_loss": 0.412,
         "calibration_error": 0.034,
-        "prediction_distribution": [
-            {"bin": "0.0-0.1", "count": 28800},
-            {"bin": "0.1-0.2", "count": 12600},
-            {"bin": "0.2-0.3", "count": 7200},
-            {"bin": "0.3-0.4", "count": 4380},
-            {"bin": "0.4-0.5", "count": 2160},
-            {"bin": "0.5-0.6", "count": 1680},
-            {"bin": "0.6-0.7", "count": 960},
-            {"bin": "0.7-0.8", "count": 1080},
-            {"bin": "0.8-0.9", "count": 840},
-            {"bin": "0.9-1.0", "count": 300},
-        ],
+        "last_trained": "2025-11-28T14:30:00",
+        "training_samples": 48000,
     }
 
 
 def get_fixture_drift_status() -> dict:
     """Return drift monitoring status."""
     return {
-        "overall_status": "healthy",
+        "overall_status": "ok",
         "features": [
-            {"feature": "payment_failure_rate", "psi": 0.032, "status": "stable"},
-            {"feature": "days_since_last_stream", "psi": 0.045, "status": "stable"},
-            {"feature": "watch_hours_decline_pct", "psi": 0.028, "status": "stable"},
-            {"feature": "support_ticket_count", "psi": 0.091, "status": "stable"},
-            {"feature": "tenure_days", "psi": 0.015, "status": "stable"},
+            {"feature": "payment_failure_rate", "psi": 0.032, "status": "ok"},
+            {"feature": "days_since_last_stream", "psi": 0.045, "status": "ok"},
+            {"feature": "watch_hours_decline_pct", "psi": 0.028, "status": "ok"},
+            {"feature": "support_ticket_count", "psi": 0.091, "status": "ok"},
+            {"feature": "tenure_days", "psi": 0.015, "status": "ok"},
             {"feature": "session_frequency_drop", "psi": 0.112, "status": "warning"},
         ],
-        "checked_at": "2025-12-01T08:00:00",
+        "last_checked": "2025-12-01T08:00:00",
     }
 
 
@@ -741,7 +694,7 @@ def create_fixture_intervention(account_id: str, strategy: str) -> dict:
         "account_id": account_id,
         "strategy": strategy,
         "status": "pending",
-        "subject": f"We want to keep you — here's what we can do",
+        "subject": "We want to keep you — here's what we can do",
         "body_html": (
             f"<html><body style='font-family:DM Sans,sans-serif;'>"
             f"<p>Hi {name},</p>"
@@ -767,54 +720,4 @@ def create_fixture_intervention(account_id: str, strategy: str) -> dict:
         ),
         "created_at": now,
         "updated_at": now,
-    }
-
-
-def get_fixture_early_warning() -> dict:
-    """Return early warning agent insight for at-risk page."""
-    return {
-        "agent_name": "Early Warning Agent",
-        "content": (
-            "### Newly Flagged Accounts This Week\n\n"
-            "**12 new accounts** crossed the high-risk threshold in the past 7 days, "
-            "grouped by root cause:\n\n"
-            "**Payment Failures (5 accounts)**\n"
-            "- 3 Regular plan subscribers with expired credit cards\n"
-            "- 2 Premium subscribers with insufficient funds\n\n"
-            "**Engagement Drop-off (4 accounts)**\n"
-            "- Average days since last stream: 28 days\n"
-            "- All were previously watching 10+ hours/week\n\n"
-            "**Support Escalation (3 accounts)**\n"
-            "- Average 3.2 open tickets per account\n"
-            "- Mean resolution time: 72 hours (vs. 24-hour SLA)\n\n"
-            "**Priority action:** The 5 payment failure accounts have the highest "
-            "save probability (78%) if contacted within 48 hours."
-        ),
-        "generated_at": "2025-12-01T08:30:00",
-        "status": "complete",
-    }
-
-
-def get_fixture_prescription_summary() -> dict:
-    """Return prescription agent summary."""
-    return {
-        "agent_name": "Prescription Agent",
-        "content": (
-            "### Intervention Recommendations\n\n"
-            "Based on the current risk analysis, **2,420 accounts** require "
-            "intervention across 4 strategies:\n\n"
-            "| Strategy | Accounts | Est. MRR at Risk | Priority |\n"
-            "|----------|----------|------------------|----------|\n"
-            "| Payment Recovery | 920 | $12,880 | Critical |\n"
-            "| Re-engagement | 680 | $9,520 | High |\n"
-            "| Content Discovery | 480 | $6,720 | Medium |\n"
-            "| Support Escalation | 340 | $4,760 | High |\n\n"
-            "**Estimated overall impact:** If all interventions are executed within "
-            "7 days, the projected retention rate is **68%**, preserving approximately "
-            "**$23,000 in monthly revenue**.\n\n"
-            "Payment recovery should be prioritized — it has the highest save rate "
-            "(62%) and the shortest effective window (48 hours)."
-        ),
-        "generated_at": "2025-12-01T10:15:00",
-        "status": "complete",
     }

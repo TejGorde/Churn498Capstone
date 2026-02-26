@@ -1,3 +1,5 @@
+import Markdown from "react-markdown";
+
 interface AgentInsightCardProps {
   title: string;
   content: string;
@@ -17,7 +19,9 @@ export default function AgentInsightCard({ title, content, timestamp }: AgentIns
         {timestamp && <span className="ml-auto text-xs text-text-muted">{timestamp}</span>}
       </div>
       <h4 className="text-sm font-medium text-text-primary">{title}</h4>
-      <p className="mt-1 text-xs leading-relaxed text-text-secondary">{content}</p>
+      <div className="prose-insight mt-1 text-xs leading-relaxed text-text-secondary">
+        <Markdown>{content}</Markdown>
+      </div>
     </div>
   );
 }

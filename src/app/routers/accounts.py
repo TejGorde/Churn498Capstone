@@ -5,7 +5,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..dependencies import get_db_engine, get_demo_mode
-from ..schemas import AccountDetail, PaginatedAccounts
+from ..schemas import AccountDetail, PaginatedAccounts, SHAPFeature
 from ..services import account_service
 
 logger = logging.getLogger(__name__)
@@ -49,14 +49,14 @@ async def get_account_detail(
     return AccountDetail(**data)
 
 
-@router.get("/{account_id}/shap")
+@router.get("/{account_id}/shap", response_model=list[SHAPFeature])
 async def get_account_shap(
     account_id: str,
     demo_mode: bool = Depends(get_demo_mode),
-) -> dict[str, float]:
+) -> list[SHAPFeature]:
     """Get SHAP explanation for an account."""
     engine = None if demo_mode else get_db_engine()
     data = account_service.get_shap_explanation(engine, account_id, demo_mode)
     if data is None:
         raise HTTPException(status_code=404, detail=f"Account {account_id} not found")
-    return data
+    return [SHAPFeature(**f) for f in data]

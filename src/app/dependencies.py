@@ -27,11 +27,13 @@ def get_demo_mode() -> bool:
     return get_config().demo_mode
 
 
-def get_db_engine() -> Engine:
-    """Return the SQLAlchemy database engine.
+def get_db_engine() -> Engine | None:
+    """Return the SQLAlchemy database engine, or None if unavailable.
 
     Uses the engine created at app startup via lifespan.
     Falls back to creating a new engine if needed.
+    Returns None instead of raising when the database is unreachable,
+    allowing services to fall back to fixture data.
     """
     global _engine
     if _engine is not None:
@@ -43,8 +45,8 @@ def get_db_engine() -> Engine:
         _engine = get_engine()
         return _engine
     except Exception as e:
-        logger.error(f"Failed to get database engine: {e}")
-        raise
+        logger.warning(f"Database unavailable: {e}")
+        return None
 
 
 def set_db_engine(engine: Engine | None) -> None:
